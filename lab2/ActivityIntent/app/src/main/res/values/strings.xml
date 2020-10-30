@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">ActivityIntent</string>
+    <string name="button_stub">OK</string>
+</resources>
