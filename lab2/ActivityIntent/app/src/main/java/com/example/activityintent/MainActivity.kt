@@ -15,18 +15,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val textView = findViewById<TextView>(R.id.counterTextView).apply {
+        val initialScoreView = findViewById<TextView>(R.id.counterTextView).apply {
             text = 0.toString()
         }
 
-        val button = findViewById<Button>(R.id.button)
-        button.setOnClickListener {
-            val scoreView = findViewById<TextView>(R.id.scoreInputView)
-            val scoreValue = scoreView.text.toString().toInt()
-            val initialValue = textView.text.toString().toInt()
+        val confirmButton = findViewById<Button>(R.id.button)
+        confirmButton.setOnClickListener {
+            val newScoreView = findViewById<TextView>(R.id.scoreInputView)
+            val newValue = newScoreView.text.toString().toInt()
+            val initialValue = initialScoreView.text.toString().toInt()
 
             val intent = Intent(this, SlaveActivity::class.java).apply {
-                putExtra("com.example.activityintent", scoreValue + initialValue)
+                putExtra("com.example.activityintent", newValue + initialValue)
             }
             startActivityForResult(intent, 80)
         }

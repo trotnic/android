@@ -12,17 +12,17 @@ class SlaveActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val scoreView = findViewById<TextView>(R.id.counterTextView).apply {
+        val initialScoreView = findViewById<TextView>(R.id.counterTextView).apply {
             text = intent.getIntExtra("com.example.activityintent", 0).toString()
         }
 
         findViewById<Button>(R.id.button).setOnClickListener {
-            val scoreView = findViewById<TextView>(R.id.scoreInputView)
-            val scoreValue = scoreView.text.toString().toInt()
-            val initialValue = scoreView.text.toString().toInt()
+            val newScoreView = findViewById<TextView>(R.id.scoreInputView)
+            val newValue = newScoreView.text.toString().toInt()
+            val initialValue = initialScoreView.text.toString().toInt()
 
             val returnIntent = Intent().apply {
-                putExtra("com.example.activityintent", scoreValue + initialValue)
+                putExtra("com.example.activityintent", newValue + initialValue)
             }
             setResult(Activity.RESULT_OK, returnIntent)
             finish()
