@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Resources and layout</string>
     <string name="button_stub">OK</string>
+    <string name="warning_title">Warning</string>
+    <string name="warning_message">You must type a value first</string>
+    <string name="warning_neutral">OK</string>
 </resources>

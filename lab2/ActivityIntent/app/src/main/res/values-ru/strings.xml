@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Ресурсы и разметка</string>
     <string name="button_stub">Подтвердить</string>
+    <string name="warning_title">Предупреждение</string>
+    <string name="warning_message">Введите значение перед подтверждением</string>
+    <string name="warning_neutral">ОК</string>
 </resources>
