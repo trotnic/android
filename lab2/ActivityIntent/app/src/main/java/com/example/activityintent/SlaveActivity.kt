@@ -13,7 +13,7 @@ class SlaveActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val initialScoreView = findViewById<TextView>(R.id.counterTextView).apply {
-            text = intent.getIntExtra("com.example.activityintent", 0).toString()
+            text = intent.getIntExtra(MainActivity.EXTRA_KEY, 0).toString()
         }
 
         findViewById<Button>(R.id.button).setOnClickListener {
@@ -22,7 +22,7 @@ class SlaveActivity : AppCompatActivity() {
             val initialValue = initialScoreView.text.toString().toInt()
 
             val returnIntent = Intent().apply {
-                putExtra("com.example.activityintent", newValue + initialValue)
+                putExtra(MainActivity.EXTRA_KEY, newValue + initialValue)
             }
             setResult(Activity.RESULT_OK, returnIntent)
             finish()

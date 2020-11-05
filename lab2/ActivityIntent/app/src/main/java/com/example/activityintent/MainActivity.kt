@@ -11,6 +11,11 @@ import org.w3c.dom.Text
 
 class MainActivity : AppCompatActivity() {
 
+    companion object Constant {
+        val EXTRA_KEY = "com.example.activityintent"
+        val REQUEST_CODE = 80
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -26,9 +31,9 @@ class MainActivity : AppCompatActivity() {
             val initialValue = initialScoreView.text.toString().toInt()
 
             val intent = Intent(this, SlaveActivity::class.java).apply {
-                putExtra("com.example.activityintent", newValue + initialValue)
+                putExtra(EXTRA_KEY, newValue + initialValue)
             }
-            startActivityForResult(intent, 80)
+            startActivityForResult(intent, REQUEST_CODE)
         }
     }
 
@@ -42,8 +47,8 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == 80 && resultCode == Activity.RESULT_OK) {
-            val newValue = data?.getIntExtra("com.example.activityintent", 0)
+        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            val newValue = data?.getIntExtra(EXTRA_KEY, 0)
             val textView = findViewById<TextView>(R.id.counterTextView)
             textView.text = newValue.toString()
         }
