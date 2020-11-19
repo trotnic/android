@@ -1,14 +1,18 @@
 package com.example.activityintent
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
+import android.content.res.Resources
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_main.view.*
 import org.w3c.dom.Text
 
 class MainActivity : AppCompatActivity() {
@@ -18,6 +22,7 @@ class MainActivity : AppCompatActivity() {
         const val REQUEST_CODE = 80
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -26,7 +31,9 @@ class MainActivity : AppCompatActivity() {
             text = 0.toString()
         }
 
-        findViewById<Button>(R.id.button).setOnClickListener {
+
+        val confirmButton = findViewById<Button>(R.id.button)
+        confirmButton.setOnClickListener {
 
             val newScoreView = findViewById<TextView>(R.id.scoreInputView)
             val newValue = newScoreView.text.toString()
@@ -39,6 +46,7 @@ class MainActivity : AppCompatActivity() {
                 builder.setPositiveButton(R.string.warning_neutral){ _, _ -> }
 
                 val alertDialog: AlertDialog = builder.create()
+
                 alertDialog.setCancelable(false)
                 alertDialog.show()
             } else {
@@ -50,6 +58,7 @@ class MainActivity : AppCompatActivity() {
                 startActivityForResult(intent, REQUEST_CODE)
             }
         }
+
     }
 
     override fun onResume() {
