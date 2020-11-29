@@ -11,32 +11,30 @@ class TimerService: Service() {
 
     val broadcastIntent: Intent = Intent(TIMER_BR)
 
+    private var timeLeft: Long = 31000
+
     companion object {
         const val TIMER_BR = "com.uvolchyk.time.TIME_SEND"
+        const val TIMER_FAULT_FLAG = -1
+        const val TIMER_START_FLAG = 0
+        const val TIMER_PAUSE_FLAG = 1
+        const val TIMER_RESUME_FLAG = 2
+        const val TIMER_RESET_FLAG = 3
+        const val TIMER_INTENT_TYPE = "com.uvolchyk.time.TYPE"
+
+        const val TIMER_COUNTDOWN_VALUE = "toCount"
     }
 
     private lateinit var timer: CountDownTimer
 
     inner class TimerBinder: Binder() {
-
         val service: TimerService
             get() = this@TimerService
-
     }
 
     override fun onCreate() {
         super.onCreate()
-        timer = object: CountDownTimer(30000, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                broadcastIntent.putExtra("toCount", millisUntilFinished / 1000)
-                LocalBroadcastManager.getInstance(this@TimerService).sendBroadcast(broadcastIntent)
-            }
-
-            override fun onFinish() {
-                broadcastIntent.putExtra("toCount", -1)
-                LocalBroadcastManager.getInstance(this@TimerService).sendBroadcast(broadcastIntent)
-            }
-        }
+        timer = setupTimer(timeLeft)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -44,9 +42,41 @@ class TimerService: Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val secondsToCount = intent?.getLongExtra("toCount", 100) ?: 20
-        timer.start()
+        when(intent?.getIntExtra(TIMER_INTENT_TYPE, TIMER_FAULT_FLAG) ?: TIMER_FAULT_FLAG) {
+            TIMER_START_FLAG -> {
+                timer.start()
+            }
+            TIMER_PAUSE_FLAG -> {
+                println(timeLeft)
+                timer.cancel()
+            }
+            TIMER_RESUME_FLAG -> {
+                timer = setupTimer(timeLeft).start()
+            }
+            TIMER_RESET_FLAG -> {
+                timer.cancel()
+                timer.onFinish()
+            }
+            TIMER_FAULT_FLAG -> {
+                println("Ooops, i did it again... 🙃")
+            }
+        }
         return super.onStartCommand(intent, flags, startId)
+    }
+
+    private fun setupTimer(time: Long): CountDownTimer {
+        return object: CountDownTimer(time, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                timeLeft = millisUntilFinished
+                broadcastIntent.putExtra(TIMER_COUNTDOWN_VALUE, millisUntilFinished / 1000)
+                LocalBroadcastManager.getInstance(this@TimerService).sendBroadcast(broadcastIntent)
+            }
+
+            override fun onFinish() {
+                broadcastIntent.putExtra(TIMER_COUNTDOWN_VALUE, -1)
+                LocalBroadcastManager.getInstance(this@TimerService).sendBroadcast(broadcastIntent)
+            }
+        }
     }
 
 //    fun timestamp(): String {

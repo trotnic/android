@@ -21,29 +21,29 @@ class MainActivity : AppCompatActivity() {
     private lateinit var broadcastReceiver: BroadcastReceiver
 
     private var isCounting: Boolean = false
+    private var isFired: Boolean = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val intent = Intent(this, TimerService::class.java)
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+        isServiceBound = true
 
         val textView = findViewById<TextView>(R.id.timerTextView)
         textView.text = "🙌"
 
-//        val timerButton = findViewById<Button>(R.id.timerButton).setOnClickListener {
-//            val intent = Intent(this, TimerService::class.java)
-//            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
-//
-//        }
-
-//        val showButton = findViewById<Button>(R.id.timerShowTime).setOnClickListener {
-//            textView.text = timerService?.timestamp() ?: "Hello"
-//        }
-
         broadcastReceiver = object: BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                textView.text = if(intent?.getLongExtra("toCount", 0) ?: 0 > 0) intent?.getLongExtra("toCount", 0).toString() else "🙌"
+                val ticks = intent?.getLongExtra(TimerService.TIMER_COUNTDOWN_VALUE, 0) ?: 0
+                if (ticks > 0) {
+                    textView.text = ticks.toString()
+                } else {
+                    isCounting = false
+                    isFired = false
+                    textView.text = "🙌"
+                }
             }
         }
 
@@ -57,26 +57,43 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        menu?.getItem(1)?.isEnabled = !isCounting
+        menu?.getItem(0)?.isEnabled = isFired
+        menu?.getItem(1)?.isEnabled = !isCounting && !isFired
+        menu?.getItem(2)?.isEnabled = isCounting && isFired
+        menu?.getItem(3)?.isEnabled = !isCounting && isFired
         return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_reset_item -> {
-//                TimeInputFragment().show(supportFragmentManager, "ok")
+                val intent = Intent(this, TimerService::class.java)
+                intent.putExtra(TimerService.TIMER_INTENT_TYPE, TimerService.TIMER_RESET_FLAG)
+                timerService?.startService(intent)
                 isCounting = false
+                isFired = false
                 true
             }
             R.id.menu_start_item -> {
-                timerService?.startService(Intent(this, TimerService::class.java))
+                val intent = Intent(this, TimerService::class.java)
+                intent.putExtra(TimerService.TIMER_INTENT_TYPE, TimerService.TIMER_START_FLAG)
+                timerService?.startService(intent)
                 isCounting = true
+                isFired = true
                 true
             }
-            R.id.menu_stop_item -> {
+            R.id.menu_pause_item -> {
+                val intent = Intent(this, TimerService::class.java)
+                intent.putExtra(TimerService.TIMER_INTENT_TYPE, TimerService.TIMER_PAUSE_FLAG)
+                timerService?.startService(intent)
+                isCounting = false
                 true
             }
             R.id.menu_resume_item -> {
+                val intent = Intent(this, TimerService::class.java)
+                intent.putExtra(TimerService.TIMER_INTENT_TYPE, TimerService.TIMER_RESUME_FLAG)
+                timerService?.startService(intent)
+                isCounting = true
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -91,10 +108,13 @@ class MainActivity : AppCompatActivity() {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
             timerService = (service as TimerService.TimerBinder).service
             isServiceBound = true
-//            val intent = Intent(this@MainActivity, TimerService::class.java)
-//            intent.putExtra("toCount", (123).toLong())
-//            timerService?.startService(intent)
-//            println("AND HERE")
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if(isServiceBound) {
+            unbindService(serviceConnection)
         }
     }
 
