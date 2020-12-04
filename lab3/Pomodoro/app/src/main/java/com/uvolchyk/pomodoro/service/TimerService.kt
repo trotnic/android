@@ -5,7 +5,9 @@ import android.content.Intent
 import android.os.Binder
 import android.os.CountDownTimer
 import android.os.IBinder
+import android.widget.Toast
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.uvolchyk.pomodoro.R
 
 class TimerService: Service() {
 
@@ -58,7 +60,7 @@ class TimerService: Service() {
                 timer.onFinish()
             }
             TIMER_FAULT_FLAG -> {
-                println("Ooops, i did it again... 🙃")
+                Toast.makeText(this, R.string.fault_message, Toast.LENGTH_SHORT).show()
             }
         }
         return super.onStartCommand(intent, flags, startId)
@@ -78,13 +80,4 @@ class TimerService: Service() {
             }
         }
     }
-
-//    fun timestamp(): String {
-//        val elapsedMillis: Long = (SystemClock.elapsedRealtime() - chronometer.base)
-//        val hours = (elapsedMillis / 3600000).toInt()
-//        val minutes = (elapsedMillis - hours * 3600000).toInt() / 60000
-//        val seconds = (elapsedMillis - hours * 3600000 - minutes * 60000).toInt() / 1000
-//        val millis = (elapsedMillis - hours * 3600000 - minutes * 60000 - seconds * 1000).toInt()
-//        return "$hours:$minutes:$seconds:$millis"
-//    }
 }

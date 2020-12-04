@@ -5,12 +5,10 @@ import android.os.Bundle
 import android.os.IBinder
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.uvolchyk.pomodoro.R
-import com.uvolchyk.pomodoro.fragments.TimeInputFragment
 import com.uvolchyk.pomodoro.service.TimerService
 
 
@@ -23,16 +21,29 @@ class MainActivity : AppCompatActivity() {
     private var isCounting: Boolean = false
     private var isFired: Boolean = false
 
+    companion object {
+        const val isCountingKey = "isCounting"
+        const val isFiredKey = "isFired"
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(isCountingKey, isCounting)
+        outState.putBoolean(isFiredKey, isFired)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val intent = Intent(this, TimerService::class.java)
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+
+        isCounting = savedInstanceState?.getBoolean(isCountingKey) ?: false
+        isFired = savedInstanceState?.getBoolean(isFiredKey) ?: false
+
+        bindService(Intent(this, TimerService::class.java), serviceConnection, Context.BIND_AUTO_CREATE)
         isServiceBound = true
 
         val textView = findViewById<TextView>(R.id.timerTextView)
-        textView.text = "🙌"
+        textView.text = getString(R.string.default_message)
 
         broadcastReceiver = object: BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -42,7 +53,7 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     isCounting = false
                     isFired = false
-                    textView.text = "🙌"
+                    textView.text = getString(R.string.default_message)
                 }
             }
         }
@@ -51,7 +62,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        val inflater = menuInflater
         menuInflater.inflate(R.menu.menu, menu)
         return true
     }
